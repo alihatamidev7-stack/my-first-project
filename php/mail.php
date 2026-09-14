@@ -1,45 +1,38 @@
 <?php
 
 /*
-	The Send Mail php Script for Contact Form
-	Server-side data validation is also added for good data validation.
-*/
+ * Send Mail PHP Script for Contact Form
+ * Server-side validation is included for safer form handling.
+ */
 
-// $name = $_POST['name'];
-// $email = $_POST['email'];
-// $note = $_POST['note'];
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    exit('Method Not Allowed');
+}
 
-// if( $name == '' || $email == '' || filter_var($email, FILTER_VALIDATE_EMAIL) == false ){
-// 	// Set a 400 (bad request) response code and exit.
-// 	http_response_code(400);
-// }
-// else{
+$name = trim($_POST['name'] ?? '');
+$email = trim($_POST['email'] ?? '');
+$note = trim($_POST['note'] ?? '');
 
-// 	$formcontent="نام: $name\nایمیل: $email\n\nپیام:\n$note";
+if ($name === '' || mb_strlen($name) < 2 || $email === '' || filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+    http_response_code(400);
+    exit('Invalid form data');
+}
 
-// 	//Place your Email Here
-// 	$recipient = "alihatamidev.7@gmail.com";
+$formcontent = "نام: {$name}\nایمیل: {$email}\n\nپیام:\n{$note}";
+$recipient = 'alihatamidev.7@gmail.com';
+$subject = 'پیام جدید در وب‌سایت';
 
-// 	$mailheader = "From:$email\r\n";
+$headers = "From: {$recipient}\r\n";
+$headers .= "Reply-To: {$email}\r\n";
+$headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
 
-// 	if( mail($recipient, 'پیام جدید در وب‌سایت', $formcontent, $mailheader) ){
-// 		// Set a 200 (okay) response code.
-// 		http_response_code(200);
-// 	}
-// 	else{
-// 		// Set a 500 (internal server error) response code.
-// 		http_response_code(500);
-// 	}
-// }
-
-
-	$a = 1;
-	$b = 2;
-
-
-	if($a == 1 & $b == 3){
-		echo 'ok'
-	}
-
+if (mail($recipient, $subject, $formcontent, $headers)) {
+    http_response_code(200);
+    echo 'ok';
+} else {
+    http_response_code(500);
+    echo 'Mail could not be sent';
+}
 
 ?>
